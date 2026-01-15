@@ -1,0 +1,86 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main, master, develop ]
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+      
+      - name: Run tests
+        working-directory: ./backend
+        run: npm test
+        env:
+          MONGODB_URI: mongodb://localhost:27017/pds_test
+          JWT_SECRET: test-secret-key
+          NODE_ENV: test
+      
+      - name: Build Docker image
+        working-directory: ./backend
+        run: docker build -t pds-backend:latest .
+
+  frontend-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+      
+      - name: Run tests
+        working-directory: ./frontend
+        run: npm test -- --watchAll=false
+      
+      - name: Build application
+        working-directory: ./frontend
+        run: npm run build
+        env:
+          REACT_APP_API_URL: http://localhost:5000/api
+      
+      - name: Build Docker image
+        working-directory: ./frontend
+        run: docker build -t pds-frontend:latest .
+
+  docker-compose:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build and test with Docker Compose
+        run: |
+          docker-compose build
+          docker-compose up -d
+          sleep 10
+          docker-compose ps
+          docker-compose logs
+      
+      - name: Cleanup
+        if: always()
+        run: docker-compose down -v
