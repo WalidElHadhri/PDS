@@ -1,2 +1,4 @@
 [config]
+# Specify the project folder. Azure Kudu will cd into this folder before running npm install.
 project = backend
+

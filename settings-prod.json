@@ -1,0 +1,32 @@
+[
+  {
+    "name": "MONGODB_URI",
+    "value": "mongodb+srv://walidelhadhri_db_user:walid123456@cluster0.ebiwtin.mongodb.net/pds?retryWrites=true&w=majority",
+    "slotSetting": false
+  },
+  {
+    "name": "JWT_SECRET",
+    "value": "academic-project-secret-key-change-in-production",
+    "slotSetting": false
+  },
+  {
+    "name": "JWT_EXPIRES_IN",
+    "value": "7d",
+    "slotSetting": false
+  },
+  {
+    "name": "NODE_ENV",
+    "value": "production",
+    "slotSetting": false
+  },
+  {
+    "name": "PORT",
+    "value": "5000",
+    "slotSetting": false
+  },
+  {
+    "name": "WEBSITES_PORT",
+    "value": "5000",
+    "slotSetting": false
+  }
+]
