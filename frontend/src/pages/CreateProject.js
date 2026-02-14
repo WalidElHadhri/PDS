@@ -26,7 +26,10 @@ const CreateProject = () => {
   return (
     <div>
       <h1>Create New Project</h1>
-      <div className="card" style={{ maxWidth: '600px' }}>
+      <div className="card" style={{ maxWidth: '700px' }}>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px', fontSize: '15px' }}>
+          Start a new collaborative project. You can add collaborators and manage versions after creation.
+        </p>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Project Name *</label>
@@ -36,6 +39,7 @@ const CreateProject = () => {
               onChange={(e) => setName(e.target.value)}
               required
               maxLength={100}
+              placeholder="Enter project name"
             />
           </div>
           <div className="form-group">
@@ -44,10 +48,12 @@ const CreateProject = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               maxLength={500}
+              placeholder="Describe your project (optional)"
+              style={{ minHeight: '120px' }}
             />
           </div>
           {error && <div className="error">{error}</div>}
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
             <button
               type="submit"
               className="btn btn-primary"

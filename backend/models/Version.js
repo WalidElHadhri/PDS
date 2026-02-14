@@ -21,6 +21,18 @@ const versionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
+  },
+  // Optional snapshot of the shared code file at the time this version was created.
+  codeFile: {
+    filename: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'Code file name cannot exceed 100 characters']
+    },
+    content: {
+      type: String,
+      maxlength: [20000, 'Code file content cannot exceed 20000 characters']
+    }
   }
 }, {
   timestamps: true

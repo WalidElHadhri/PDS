@@ -37,17 +37,28 @@ app.use((req, res) => {
 });
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/pds')
-  .then(() => {
+const startServer = async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/pds');
     console.log('Connected to MongoDB');
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch((error) => {
+
+    // Only start listening when not in a test environment. Tests will connect to the DB
+    // but should not bind to a network port to avoid conflicts.
+    if (process.env.NODE_ENV !== 'test' && require.main === module) {
+      const PORT = process.env.PORT || 5000;
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    }
+  } catch (error) {
     console.error('MongoDB connection error:', error);
+    // In test environments, throw so tests can surface the error
+    if (process.env.NODE_ENV === 'test') throw error;
     process.exit(1);
-  });
+  }
+};
+
+// Start server (connect to DB). This runs on import.
+startServer();
 
 module.exports = app;

@@ -46,12 +46,12 @@ const Login = () => {
             />
           </div>
           {error && <div className="error">{error}</div>}
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-            Login
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '8px' }}>
+            Sign In
           </button>
         </form>
-        <p style={{ marginTop: '15px', textAlign: 'center' }}>
-          Don't have an account? <Link to="/register">Register here</Link>
+        <p style={{ marginTop: '24px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '14px' }}>
+          Don't have an account? <Link to="/register" style={{ color: 'var(--primary-color)', fontWeight: '500', textDecoration: 'none' }}>Register here</Link>
         </p>
       </div>
     </div>

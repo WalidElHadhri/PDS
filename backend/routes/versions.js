@@ -16,7 +16,7 @@ router.get('/:id/versions', auth, checkProjectAccess, async (req, res) => {
       .populate('createdBy', 'username email')
       .sort({ createdAt: -1 });
 
-    res.json({ versions });
+    res.json({ versions, currentVersion: req.project.currentVersion || null });
   } catch (error) {
     console.error('Get versions error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -49,15 +49,27 @@ router.post('/:id/versions', [
 
     const { versionNumber, description } = req.body;
 
+    // Snapshot the current shared code file (if any) at the time this version is created.
+    const codeFileSnapshot = req.project.codeFile
+      ? {
+          filename: req.project.codeFile.filename,
+          content: req.project.codeFile.content
+        }
+      : undefined;
+
     const version = new Version({
       project: req.params.id,
       versionNumber,
       description: description || '',
-      createdBy: req.user._id
+      createdBy: req.user._id,
+      ...(codeFileSnapshot && { codeFile: codeFileSnapshot })
     });
 
     await version.save();
     await version.populate('createdBy', 'username email');
+
+    // Optionally, you could automatically set the newest version as current.
+    // For now we just return the created version and let the user choose which is current.
 
     res.status(201).json({
       message: 'Version created successfully',
@@ -66,6 +78,43 @@ router.post('/:id/versions', [
   } catch (error) {
     console.error('Create version error:', error);
     res.status(500).json({ message: 'Server error creating version' });
+  }
+});
+
+// @route   PUT /api/projects/:id/versions/:versionId/current
+// @desc    Set the current (active) version metadata for the project
+// @access  Private (owner or collaborator)
+router.put('/:id/versions/:versionId/current', auth, checkProjectAccess, async (req, res) => {
+  try {
+    const { id, versionId } = req.params;
+
+    // Ensure the version belongs to this project
+    const version = await Version.findOne({ _id: versionId, project: id });
+    if (!version) {
+      return res.status(404).json({ message: 'Version not found for this project' });
+    }
+
+    // Update the project's currentVersion pointer
+    req.project.currentVersion = version._id;
+
+    // If this version captured a code file snapshot, restore it as the current shared code file.
+    if (version.codeFile && (version.codeFile.filename || version.codeFile.content)) {
+      req.project.codeFile = {
+        filename: version.codeFile.filename || req.project.codeFile?.filename || 'Main.java',
+        content: version.codeFile.content || '',
+        updatedAt: new Date()
+      };
+    }
+
+    await req.project.save();
+
+    res.json({
+      message: 'Current version updated successfully',
+      currentVersion: req.project.currentVersion
+    });
+  } catch (error) {
+    console.error('Set current version error:', error);
+    res.status(500).json({ message: 'Server error updating current version' });
   }
 });
 

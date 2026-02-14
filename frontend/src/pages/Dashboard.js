@@ -64,11 +64,18 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div style={{ marginTop: '30px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2>My Projects</h2>
+      <div style={{ marginTop: '40px' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          marginBottom: '24px',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <h2 style={{ marginBottom: 0 }}>My Projects</h2>
           <Link to="/projects/new" className="btn btn-primary">
-            Create New Project
+            + Create New Project
           </Link>
         </div>
 
@@ -77,14 +84,31 @@ const Dashboard = () => {
             <p>No projects yet. Create your first project!</p>
           </div>
         ) : (
-          <div className="projects-grid">
+          <div className="projects-list">
             {projects.map((project) => (
-              <Link key={project._id} to={`/projects/${project._id}`} className="project-card">
-                <h3>{project.name}</h3>
-                <p>{project.description || 'No description'}</p>
-                <div className="project-meta">
-                  <span>Owner: {project.owner.username}</span>
-                  <span>Collaborators: {project.collaborators?.length || 0}</span>
+              <Link key={project._id} to={`/projects/${project._id}`} className="project-row">
+                <div className="project-row-left">
+                  <div className="project-row-title">
+                    <span style={{ fontSize: '18px' }}>📁</span>
+                    <h3>{project.name}</h3>
+                    <span className="project-row-badge">
+                      {project.owner?._id === JSON.parse(localStorage.getItem('user'))?.id ? 'Owned' : 'Shared'}
+                    </span>
+                  </div>
+                  <div className="project-row-desc">
+                    {project.description || 'No description provided.'}
+                  </div>
+                </div>
+
+                <div className="project-row-right">
+                  <div className="project-row-meta">
+                    <span style={{ fontSize: '14px' }}>👤</span>
+                    <span>{project.owner.username}</span>
+                  </div>
+                  <div className="project-row-meta">
+                    <span style={{ fontSize: '14px' }}>👥</span>
+                    <span>{project.collaborators?.length || 0}</span>
+                  </div>
                 </div>
               </Link>
             ))}

@@ -35,6 +35,27 @@ const projectSchema = new mongoose.Schema({
     type: String,
     default: '',
     maxlength: [10000, 'Documentation cannot exceed 10000 characters']
+  },
+  currentVersion: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Version',
+    default: null
+  },
+  codeFile: {
+    filename: {
+      type: String,
+      trim: true,
+      maxlength: [100, 'Code file name cannot exceed 100 characters'],
+      default: 'Main.java'
+    },
+    content: {
+      type: String,
+      default: '',
+      maxlength: [20000, 'Code file content cannot exceed 20000 characters']
+    },
+    updatedAt: {
+      type: Date
+    }
   }
 }, {
   timestamps: true
