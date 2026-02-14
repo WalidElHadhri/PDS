@@ -2,17 +2,17 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files (for better caching)
 COPY package*.json ./
 
-# Install all dependencies (including dev dependencies for development)
-RUN npm ci
+# Install only production dependencies
+RUN npm ci --only=production
 
 # Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 5000
+# Expose port (8080 is standard for Azure App Service)
+EXPOSE 8080
 
-# Start server (can be overridden in docker-compose)
-CMD ["node", "server.js"]
+# Start server
+CMD ["npm", "start"]
